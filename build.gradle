@@ -82,7 +82,9 @@ tasks.processDemoResources {
 
 tasks.register('demoJar', Jar) {
     archiveClassifier = 'demo'
+    archiveBaseName = 'GUIMenusDemo'
     from sourceSets.demo.output
+    from sourceSets.main.output   // embedded test plugin: also carry the library classes
 }
 
 tasks.named('build') {

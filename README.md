@@ -125,6 +125,8 @@ public class MyPlugin extends JavaPlugin {
 
 Labels are parsed with [MiniMessage](https://docs.advntr.dev/minimessage.html), so gradients (`<gradient:#6ee7ff:#3fa9f5>`), `<bold>`, `<red>`, etc. all work — including in the menu title passed to `new Menu(...)`.
 
+![Example](https://raw.githubusercontent.com/MatuMaKa/images/refs/heads/main/guimenus.png)
+
 ---
 
 <a id="customization"></a>
