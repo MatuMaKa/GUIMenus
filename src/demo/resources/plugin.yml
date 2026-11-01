@@ -1,0 +1,10 @@
+name: GUIMenus
+version: ${version}
+main: com.matumaka.guimenus.GUIMenus
+api-version: '1.21'
+authors: [ MatuMaKa ]
+description: An API for GUI Menus.
+website: https://github.com/MatuMaKa/GUIMenus
+commands:
+  testui:
+    description: Shows the test GUI

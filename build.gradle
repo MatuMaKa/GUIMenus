@@ -1,0 +1,120 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.24"
+}
+
+group = 'com.matumaka'
+version = project.version
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+}
+
+dependencies {
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
+}
+
+def targetJavaVersion = 21
+
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release.set(targetJavaVersion)
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+// ---------------------------------------------------------------------------
+// Demo plugin (source set "demo"): test command + plugin.yml.
+// Built into a separate "-demo" jar and NOT included in the library publication.
+// ---------------------------------------------------------------------------
+sourceSets {
+    demo {
+        java {
+            srcDirs = ['src/demo/java']
+        }
+        resources {
+            srcDirs = ['src/demo/resources']
+        }
+    }
+}
+
+configurations {
+    demoImplementation.extendsFrom implementation
+    demoCompileOnly.extendsFrom compileOnly
+}
+
+dependencies {
+    demoImplementation sourceSets.main.output
+}
+
+sourceSets.demo.compileClasspath += sourceSets.main.output
+
+tasks.processDemoResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+tasks.register('demoJar', Jar) {
+    archiveClassifier = 'demo'
+    from sourceSets.demo.output
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('demoJar')
+}
+
+// ---------------------------------------------------------------------------
+// Publishing (JitPack runs `publishToMavenLocal` on git tags)
+// ---------------------------------------------------------------------------
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'GUIMenus'
+                description = 'Head-tracked, display-entity GUI menus for Paper servers.'
+                url = 'https://github.com/MatuMaKa/GUIMenus'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/MatuMaKa/GUIMenus/blob/master/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'MatuMaKa'
+                    }
+                }
+            }
+        }
+    }
+}
