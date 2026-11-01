@@ -42,6 +42,9 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
     options.addStringOption('Xdoclint:none', '-quiet')
+    // Javadoc chokes on the dev bundle's decompiled NMS sources being on the
+    // source path. Warnings/errors there don't matter for our own docs.
+    failOnError = false
 }
 
 // ---------------------------------------------------------------------------
