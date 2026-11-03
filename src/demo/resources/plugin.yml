@@ -8,3 +8,4 @@ website: https://github.com/MatuMaKa/GUIMenus
 commands:
   testui:
     description: Shows the test GUI
+    usage: /<command> [bg panel|button|hover <material>]

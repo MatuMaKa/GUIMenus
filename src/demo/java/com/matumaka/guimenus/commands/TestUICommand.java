@@ -2,6 +2,7 @@ package com.matumaka.guimenus.commands;
 
 import com.matumaka.guimenus.Utils;
 import com.matumaka.guimenus.gui.Menu;
+import com.matumaka.guimenus.gui.MenuStyle;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -20,6 +21,11 @@ public class TestUICommand implements CommandExecutor {
         }
 
         final Player player = (Player) sender;
+
+        if (args.length >= 2 && args[0].equalsIgnoreCase("bg")) {
+            return this.changeBackground(player, args[1], args.length >= 3 ? args[2] : null);
+        }
+
         final Menu menu = Menu.getMenu(player);
 
         if (menu != null) {
@@ -41,6 +47,53 @@ public class TestUICommand implements CommandExecutor {
         creditsMenu.registerButton("Back", () -> mainMenu.displayTo(player));
 
         mainMenu.displayTo(player);
+        return true;
+    }
+
+    /**
+     * Handles {@code /testui bg <panel|button|hover> <material>} — changes the
+     * menu or button background. Applies live to any open menu; otherwise a
+     * fresh demo menu is opened with the new background.
+     */
+    private boolean changeBackground(Player player, String part, String materialName) {
+        if (materialName == null) {
+            player.sendActionBar(Utils.toComponent("<gray>Usage: /testui bg <panel|button> <material>"));
+            return true;
+        }
+
+        final Material material = Material.matchMaterial(materialName);
+
+        if (material == null || !material.isBlock()) {
+            player.sendActionBar(Utils.toComponent("<red>" + materialName + " is not a valid block material."));
+            return true;
+        }
+
+        final MenuStyle style;
+        final Menu open = Menu.getMenu(player);
+
+        if (open == null) {
+            style = MenuStyle.defaults();
+            new Menu("MAIN MENU", style).displayTo(player);
+        } else {
+            style = open.getStyle();
+        }
+
+        if (part.equalsIgnoreCase("panel")) {
+            style.setPanelMaterial(material);
+        } else if (part.equalsIgnoreCase("button")) {
+            style.setButtonMaterial(material);
+        } else if (part.equalsIgnoreCase("hover")) {
+            style.setButtonHoverMaterial(material);
+        } else {
+            player.sendActionBar(Utils.toComponent("<gray>Usage: /testui bg <panel|button|hover> <material>"));
+            return true;
+        }
+
+        if (open != null) {
+            open.redraw();
+        }
+
+        player.sendActionBar(Utils.toComponent("<green>Background updated to <lang:" + material.translationKey() + ">."));
         return true;
     }
 

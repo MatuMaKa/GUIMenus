@@ -168,6 +168,19 @@ public final class Menu {
     }
 
     private void draw() {
+        this.draw(true);
+    }
+
+    /**
+     * Re-renders the whole menu in place, applying any changes made to its
+     * {@link MenuStyle} (e.g. a new panel or button background). The player's
+     * camera and position are kept; the leading open sound is not replayed.
+     */
+    public void redraw() {
+        this.draw(false);
+    }
+
+    private void draw(boolean playOpenSound) {
         final boolean hasTitle = this.hasTitle();
         final int rows = this.buttons.size() + (hasTitle ? 1 : 0);
         final float height = (float) (rows * this.style.getRowSpacing() + PANEL_GAP);
@@ -195,7 +208,7 @@ public final class Menu {
 
         this.cursor.setTeleportDuration(1);
 
-        this.play(this.style.getOpenSound(), this.style.getOpenSoundPitch());
+        this.play(playOpenSound ? this.style.getOpenSound() : null, this.style.getOpenSoundPitch());
         this.tick();
     }
 

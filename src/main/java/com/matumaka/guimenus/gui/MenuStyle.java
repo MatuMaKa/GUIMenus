@@ -317,6 +317,15 @@ public final class MenuStyle {
         return this.panelMaterial;
     }
 
+    /**
+     * Sets the backdrop panel block. Menus that are already open re-render
+     * live when redrawn via {@code Menu#redraw()}.
+     */
+    public MenuStyle setPanelMaterial(Material material) {
+        this.panelMaterial = material;
+        return this;
+    }
+
     /** May be null (accent bar hidden). */
     public Material getAccentMaterial() {
         return this.accentMaterial;
@@ -328,6 +337,24 @@ public final class MenuStyle {
 
     public Material getButtonHoverMaterial() {
         return this.buttonHoverMaterial;
+    }
+
+    /**
+     * Sets the button block shown when not hovered. Menus that are already
+     * open re-render live when redrawn via {@code Menu#redraw()}.
+     */
+    public MenuStyle setButtonMaterial(Material material) {
+        this.buttonMaterial = material;
+        return this;
+    }
+
+    /**
+     * Sets the button block shown when hovered. Menus that are already open
+     * re-render live when redrawn via {@code Menu#redraw()}.
+     */
+    public MenuStyle setButtonHoverMaterial(Material material) {
+        this.buttonHoverMaterial = material;
+        return this;
     }
 
     /** May be null (title font applied directly to title text). */
