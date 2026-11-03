@@ -21,9 +21,13 @@ Head-tracked, display-entity GUI menus for Paper servers. Instead of chest inven
 <a id="installation"></a>
 ## Installation
 
+[![Release](https://jitpack.io/v/MatuMaKa/GUIMenus.svg)](https://jitpack.io/#MatuMaKa/GUIMenus)
+
+Grab a version from the JitPack site: **[jitpack.io/#MatuMaKa/GUIMenus](https://jitpack.io/#MatuMaKa/GUIMenus)** — each page shows the build status and available tags; current release is **v1.1**.
+
 Since JitPack coordinates just wrap *your* repository, the snippets below use the canonical repo URL.
 
-*If you are the repo owner reading this, nothing extra goes in your build file — JitPack takes care of it once you push a git tag (e.g. `v1.0`) or set a release.*
+*If you are the repo owner reading this, nothing extra goes in your build file — JitPack takes care of it once you push a git tag (e.g. `v1.1`) or set a release.*
 
 As a dependency in your `build.gradle`:
 
@@ -154,6 +158,15 @@ MenuStyle style = MenuStyle.builder()
 Menu menu = new Menu("SERVER SELECT", style);
 ```
 
+**Changing the look while a menu is open** — the panel and button backgrounds are mutable: update them on the style and call `Menu#redraw()` to re-render the open menu in place (no close/reopen, no flicker, no open sound replay):
+
+```java
+style.setPanelMaterial(Material.BLUE_CONCRETE);      // menu background
+style.setButtonMaterial(Material.WHITE_CONCRETE);    // button background (resting)
+style.setButtonHoverMaterial(Material.CYAN_CONCRETE); // button background (hovered)
+menu.redraw();                                       // applies immediately
+```
+
 A menu can also be built **without a heading at all**:
 
 ```java
@@ -190,6 +203,7 @@ menu.registerButton(
 - `registerButton(String label, Material icon, Runnable action)` — shows an item-display icon left of the label
 - `registerButton(Button)` — fully customized button (see [Customization](#customization))
 - `displayTo(Player)` — opens the menu; automatically mounts the camera rig if the player does not already have one open, or transitions seamlessly if they do (multi-page flows just call `displayTo` again)
+- `redraw()` — re-renders the open menu in place after mutating its `MenuStyle` (e.g. changed background blocks)
 - `close()` — unmounts everything and restores the player
 - `getStyle()` — this menu's `MenuStyle`
 - Low-level hooks: overloaded `spawnText` / `spawnBlock` / `spawnItem` (WebGL-free, style offsets applied automatically)
@@ -197,6 +211,7 @@ menu.registerButton(
 
 ### `MenuStyle` & `Button`
 - `MenuStyle.builder()` — full customization of the menu look/behavior, see [Customization](#customization)
+- `setPanelMaterial` / `setButtonMaterial` / `setButtonHoverMaterial` — mutable background blocks on an existing style (pair with `Menu#redraw()`)
 - `Button.builder(label)` — per-button overrides; setters (`setLabel`, `setIcon`, `setAction`) also exist for convenience
 ### `Utils`
 - `toComponent(String)` — MiniMessage deserialization
@@ -224,7 +239,7 @@ menu.registerButton(
 ./gradlew publishToMavenLocal
 ```
 
-Requires Java 21. The demo plugin jar built from `src/demo` will be in `build/libs/GUIMenus-1.0-demo.jar`.
+Requires Java 21. The demo plugin jar built from `src/demo` will be in `build/libs/GUIMenus-1.1-demo.jar`.
 
 ## License
 
