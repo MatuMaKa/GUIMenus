@@ -262,7 +262,8 @@ public void onMenuClose(MenuCloseEvent event) {
 ---
 ## Notes & caveats
 
-- Close handling out of the box: sneak closes, and death, quit, teleporting all close the menu. A self-interaction kick-event is cancelled while in a menu so the player isn't accidentally disconnected.
+- Close handling out of the box: sneak closes (disable per style with `sneakCloses(false)`), and death, quit, teleporting all close the menu. A self-interaction kick-event is cancelled while in a menu so the player isn't accidentally disconnected.
+- The menu lifecycle fires Bukkit events under `com.matumaka.guimenus.events` — `MenuOpenEvent` (cancellable), `MenuClickEvent` (cancellable) and `MenuCloseEvent` (with a close `Reason`). See [Events](#events).
 - While a menu is open the player is put briefly invisible and mounted on an invisible pig used as a camera tripod; movement is normal (it steers the cursor), sneak closes the menu.
 - Menus are per-player; the target player and open menus are automatically tracked. Everything is cleaned up on quit/disable.
 - Timing: `displayTo` re-uses an existing camera; opening a new menu over an existing one is seamless (no flicker).
