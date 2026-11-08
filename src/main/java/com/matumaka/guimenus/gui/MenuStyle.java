@@ -61,6 +61,8 @@ public final class MenuStyle {
 
     private long clickDelay = 250;
 
+    private boolean sneakCloses = true;
+
     private MenuStyle() {}
 
     /**
@@ -279,6 +281,15 @@ public final class MenuStyle {
             return this;
         }
 
+        /**
+         * Whether the player can close the menu by sneaking. Enabled by default;
+         * disable for menus that should only be closed through their own buttons.
+         */
+        public Builder sneakCloses(boolean sneakCloses) {
+            MenuStyle.this.sneakCloses = sneakCloses;
+            return this;
+        }
+
         /** Creates the style. */
         public MenuStyle build() {
             return MenuStyle.this;
@@ -444,5 +455,21 @@ public final class MenuStyle {
 
     public long getClickDelay() {
         return this.clickDelay;
+    }
+
+    /**
+     * Whether the player can close this menu by sneaking.
+     */
+    public boolean isSneakCloses() {
+        return this.sneakCloses;
+    }
+
+    /**
+     * Toggles sneak-to-close for menus using this style. Applies immediately
+     * to menus that are already open.
+     */
+    public MenuStyle setSneakCloses(boolean sneakCloses) {
+        this.sneakCloses = sneakCloses;
+        return this;
     }
 }

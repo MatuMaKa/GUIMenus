@@ -2,7 +2,11 @@ package com.matumaka.guimenus.gui;
 
 import com.matumaka.guimenus.GUIMenusAPI;
 import com.matumaka.guimenus.Utils;
+import com.matumaka.guimenus.events.MenuClickEvent;
+import com.matumaka.guimenus.events.MenuCloseEvent;
+import com.matumaka.guimenus.events.MenuOpenEvent;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -119,6 +123,10 @@ public final class Menu {
 
         this.player = player;
         this.lastClick = System.currentTimeMillis();
+
+        if (this.fireOpen(player)) {
+            return;
+        }
 
         if (previous == null) {
             this.mount();
@@ -270,14 +278,39 @@ public final class Menu {
 
         this.lastClick = now;
 
+        final MenuClickEvent event = new MenuClickEvent(this.player, this, this.hovered);
+
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            return;
+        }
+
         this.play(this.style.getClickSound(), this.style.getClickSoundPitch());
         this.hovered.click();
     }
 
+    private boolean fireOpen(Player player) {
+        final MenuOpenEvent event = new MenuOpenEvent(player, this);
+
+        Bukkit.getPluginManager().callEvent(event);
+
+        return event.isCancelled();
+    }
+
     /**
      * Unmounts the menu and restores the player to their original camera and position.
+     * Fires a {@link MenuCloseEvent} with {@link MenuCloseEvent.Reason#BUTTON}.
      */
     public void close() {
+        this.close(MenuCloseEvent.Reason.BUTTON);
+    }
+
+    /**
+     * Unmounts the menu and restores the player, firing a {@link MenuCloseEvent}
+     * with the given reason. Mostly used internally; prefer {@link #close()}.
+     */
+    public void close(MenuCloseEvent.Reason reason) {
         menus.remove(this.player.getUniqueId());
 
         this.removeDisplays();
@@ -287,6 +320,8 @@ public final class Menu {
         this.player.setInvisible(false);
         this.play(this.style.getCloseSound(), this.style.getCloseSoundPitch());
         this.player.teleport(this.start);
+
+        Bukkit.getPluginManager().callEvent(new MenuCloseEvent(this.player, this, reason));
     }
 
     /**
@@ -394,7 +429,7 @@ public final class Menu {
      */
     public static void closeAll() {
         for (final Menu menu : new ArrayList<>(menus.values())) {
-            menu.close();
+            menu.close(MenuCloseEvent.Reason.SHUTDOWN);
         }
     }
 

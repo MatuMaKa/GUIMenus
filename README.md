@@ -13,6 +13,7 @@ Head-tracked, display-entity GUI menus for Paper servers. Instead of chest inven
 - [Usage](#usage)
 - [Customization](#customization)
 - [Everything the API exposes](#everything-the-api-exposes)
+- [Events](#events)
 - [Notes & caveats](#notes--caveats)
 - [Building this repo](#building-this-repo)
 
@@ -23,7 +24,7 @@ Head-tracked, display-entity GUI menus for Paper servers. Instead of chest inven
 
 [![Release](https://jitpack.io/v/MatuMaKa/GUIMenus.svg)](https://jitpack.io/#MatuMaKa/GUIMenus)
 
-Grab a version from the JitPack site: **[jitpack.io/#MatuMaKa/GUIMenus](https://jitpack.io/#MatuMaKa/GUIMenus)** — each page shows the build status and available tags; current release is **v1.1**.
+Grab a version from the JitPack site: **[jitpack.io/#MatuMaKa/GUIMenus](https://jitpack.io/#MatuMaKa/GUIMenus)** — each page shows the build status and available tags; current release is **v1.2**.
 
 Since JitPack coordinates just wrap *your* repository, the snippets below use the canonical repo URL.
 
@@ -143,7 +144,7 @@ Every visual and behavioral detail of a menu can be changed through [`MenuStyle`
 - **Blocks** — `panelMaterial`, `accentMaterial` (title underline; `null` hides it), `buttonMaterial`, `buttonHoverMaterial`
 - **Text (MiniMessage)** — `titleFormat` (with `%s` placeholder), `buttonLabelFormat`, cursor glyph/colors (`cursorGlyph`, `cursorColor`, `cursorHoverColor`)
 - **Scales** — `titleScale`, `cursorScale`, `buttonLabelScale`, `iconScale`, `headingBarWidth`, `headingBarHeight`
-- **Behavior** — `clickDelay` (ms debounce), sounds `openSound` / `closeSound` / `clickSound` / `hoverSound` (each `null`-able for silence) with matching `*Pitch` setters
+- **Behavior** — `clickDelay` (ms debounce), whether sneaking closes the menu (`sneakCloses`), sounds `openSound` / `closeSound` / `clickSound` / `hoverSound` (each `null`-able for silence) with matching `*Pitch` setters
 
 ```java
 MenuStyle style = MenuStyle.builder()
@@ -156,6 +157,13 @@ MenuStyle style = MenuStyle.builder()
         .build();
 
 Menu menu = new Menu("SERVER SELECT", style);
+```
+
+**Disabling sneak-to-close** — players close the menu by sneaking by default; if a menu should only be closable through its own buttons, disable it on the style:
+
+```java
+MenuStyle style = MenuStyle.builder().sneakCloses(false).build();
+// or at runtime: style.setSneakCloses(false);
 ```
 
 **Changing the look while a menu is open** — the panel and button backgrounds are mutable: update them on the style and call `Menu#redraw()` to re-render the open menu in place (no close/reopen, no flicker, no open sound replay):
@@ -222,7 +230,36 @@ menu.registerButton(
 
 ---
 
-<a id="notes--caveats"></a>
+<a id="events"></a>
+## Events
+
+Every stage of a menu's lifecycle fires a Bukkit event in `com.matumaka.guimenus.events`, all exposing the `Player` via `event.getPlayer()` and the `Menu` via `event.getMenu()`:
+
+| Event | Cancelling it | Fired when |
+|---|---|---|
+| `MenuOpenEvent` | prevents the menu from being shown | just before a menu is displayed to the player |
+| `MenuClickEvent` | stops the button's action + click sound | a hovered button is clicked |
+| `MenuCloseEvent` | informational (not cancellable) | after a menu closed and the player was restored |
+
+`MenuCloseEvent#getReason()` tells you *why* it closed: `BUTTON`, `SNEAK`, `TELEPORT`, `DEATH`, `QUIT` or `SHUTDOWN`.
+
+```java
+@EventHandler
+public void onMenuOpen(MenuOpenEvent event) {
+    if (isBanned(event.getPlayer())) {
+        event.setCancelled(true);
+    }
+}
+
+@EventHandler
+public void onMenuClose(MenuCloseEvent event) {
+    if (event.getReason() == MenuCloseEvent.Reason.DEATH) {
+        // e.g. re-open the menu after the player respawns
+    }
+}
+```
+
+---
 ## Notes & caveats
 
 - Close handling out of the box: sneak closes, and death, quit, teleporting all close the menu. A self-interaction kick-event is cancelled while in a menu so the player isn't accidentally disconnected.
@@ -239,7 +276,7 @@ menu.registerButton(
 ./gradlew publishToMavenLocal
 ```
 
-Requires Java 21. The demo plugin jar built from `src/demo` will be in `build/libs/GUIMenus-1.1-demo.jar`.
+Requires Java 21. The demo plugin jar built from `src/demo` will be in `build/libs/GUIMenus-1.2-demo.jar`.
 
 ## License
 

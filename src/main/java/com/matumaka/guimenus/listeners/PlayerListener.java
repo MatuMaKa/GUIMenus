@@ -1,5 +1,6 @@
 package com.matumaka.guimenus.listeners;
 
+import com.matumaka.guimenus.events.MenuCloseEvent;
 import com.matumaka.guimenus.gui.Menu;
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import org.bukkit.entity.Player;
@@ -36,31 +37,39 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
-        if (event.isSneaking()) {
-            this.close(event.getPlayer());
+        if (!event.isSneaking()) {
+            return;
         }
+
+        final Menu menu = Menu.getMenu(event.getPlayer());
+
+        if (menu == null || !menu.getStyle().isSneakCloses()) {
+            return;
+        }
+
+        menu.close(MenuCloseEvent.Reason.SNEAK);
     }
 
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
-        this.close(event.getPlayer());
+        this.close(event.getPlayer(), MenuCloseEvent.Reason.TELEPORT);
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        this.close(event.getEntity());
+        this.close(event.getEntity(), MenuCloseEvent.Reason.DEATH);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        this.close(event.getPlayer());
+        this.close(event.getPlayer(), MenuCloseEvent.Reason.QUIT);
     }
 
-    private void close(Player player) {
+    private void close(Player player, MenuCloseEvent.Reason reason) {
         final Menu menu = Menu.getMenu(player);
 
         if (menu != null) {
-            menu.close();
+            menu.close(reason);
         }
     }
 }
