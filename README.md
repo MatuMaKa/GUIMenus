@@ -28,8 +28,6 @@ Grab a version from the JitPack site: **[jitpack.io/#MatuMaKa/GUIMenus](https://
 
 Since JitPack coordinates just wrap *your* repository, the snippets below use the canonical repo URL.
 
-*If you are the repo owner reading this, nothing extra goes in your build file — JitPack takes care of it once you push a git tag (e.g. `v1.1`) or set a release.*
-
 As a dependency in your `build.gradle`:
 
 ```groovy
